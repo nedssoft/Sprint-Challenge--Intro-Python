@@ -1,7 +1,14 @@
 # Create a class to hold a city location. Call the class "City". It should have
 # fields for name, lat and lon (representing latitude and longitude).
 
-
+import csv
+class City:
+  def __init__(self, name, lat, lon):
+    self.name = name
+    self.lat = lat
+    self.lon = lon
+  def __str__(self):
+    return f'{self.name}: {self.lat, self.lon}'
 # We have a collection of US cities with population over 750,000 stored in the
 # file "cities.csv". (CSV stands for "comma-separated values".)
 #
@@ -20,8 +27,16 @@ def cityreader(cities=[]):
   # TODO Implement the functionality to read from the 'cities.csv' file
   # For each city record, create a new City instance and add it to the 
   # `cities` list
-    
-    return cities
+    with open('cities.csv') as csvfile:
+
+      csv_data = csv.reader(csvfile);
+
+      # Skip the first line which contains the headers
+      next(csv_data)
+
+      for row in csv_data:
+        cities.append(City(row[0], float(row[3]), float(row[4])))
+      return cities
 
 cityreader(cities)
 
@@ -38,6 +53,15 @@ for c in cities:
 # function. This function should output all the cities that fall within the 
 # coordinate square.
 #
+try:
+  first_coordinate = input('Enter first coordinate [lat,lon]: ')
+  second_coordinate = input('Enter second coordinate [lat,lon]: ')
+  lat1, lon1 = first_coordinate.split(',')
+  lat2, lon2 = second_coordinate.split(',')
+except ValueError:
+  print('The coordinates must be a pair of numbers separated by comma e.g -23,45')
+
+
 # Be aware that the user could specify either a lower-left/upper-right pair of
 # coordinates, or an upper-left/lower-right pair of coordinates. Hint: normalize
 # the input data so that it's always one or the other, then search for cities.
@@ -65,7 +89,31 @@ def cityreader_stretch(lat1, lon1, lat2, lon2, cities=[]):
   within = []
 
   # TODO Ensure that the lat and lon valuse are all floats
+  try:
+    lat1 = float(lat1)
+    lon1 = float(lon1)
+    lat2 = float(lat2)
+    lon2 = float(lon2)
+    print(lat1, lon1, lat2, lon2)
+  except ValueError:
+    print('The coordinates values must be a pair of comma separated numbers')
+
   # Go through each city and check to see if it falls within 
   # the specified coordinates.
-
+  lat_min = min(lat1, lat2)
+  lon_min = min(lon1, lon2) 
+  lat_max = max(lat1, lat2)
+  lon_max = max(lon1, lon2)
+  for city in cities:
+    if (city.lat >= lat_min and city.lat <= lat_max) and (city.lon >= lon_min and city.lon <= lon_max):
+      within.append(city)
   return within
+
+
+cities_within = cityreader_stretch(lat1, lon1, lat2, lon2,cities)
+
+if (len(cities_within)):
+  for cw in cities_within:
+    print(cw)
+else:
+  print('The specified coordinate has no city')
